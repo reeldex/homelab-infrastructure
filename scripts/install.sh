@@ -27,9 +27,8 @@ helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
 helm repo update
 helm install jaeger jaegertracing/jaeger \
   --namespace monitoring \
-  --create-namespace
+  --create-namespace \
   --values jaeger-values.yaml
-
 
 # ----------------------------------------------------------------------------------------------
 # Add the prometheus-community Helm repository
@@ -37,6 +36,6 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 helm install prometheus prometheus-community/prometheus \
   --namespace monitoring \
-  --create-namespace
+  --create-namespace \
   --values prometheus-values.yaml
 
