@@ -5,7 +5,10 @@ fullnameOverride: "jaeger"
 allInOne:
   enabled: true
   image:
-    tag: "1.50.0"
+    tag: "1.60.0"
+
+provisionDataStore:
+  cassandra: false
 
 # Storage configuration
 storage:
