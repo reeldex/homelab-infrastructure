@@ -26,7 +26,8 @@ helm upgrade --install otel-collector opentelemetry/opentelemetry-collector \
 helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
 helm repo update
 helm install jaeger jaegertracing/jaeger \
-  --namespace tracing \
+  --namespace monitoring \
+  --create-namespace
   --values jaeger-values.yaml
 
 
@@ -36,5 +37,6 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 helm install prometheus prometheus-community/prometheus \
   --namespace monitoring \
+  --create-namespace
   --values prometheus-values.yaml
 

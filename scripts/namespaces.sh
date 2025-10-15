@@ -9,7 +9,6 @@ cd "$(dirname "$0")/.."
 echo "Creating namespaces..."
 kubectl apply -f cluster-config/namespaces/monitoring.yaml
 kubectl apply -f cluster-config/namespaces/logging.yaml
-kubectl apply -f cluster-config/namespaces/trace.yaml
 
 # Wait for namespace to be ready
 sleep 2
