@@ -1,0 +1,64 @@
+loki:
+  auth_enabled: false
+  
+  commonConfig:
+    replication_factor: 1
+    path_prefix: /var/loki
+  
+  storage:
+    type: 'filesystem'
+  
+  schemaConfig:
+    configs:
+    - from: "2024-04-01"
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: loki_index_
+        period: 24h
+  
+  server:
+    http_listen_port: 3100
+
+deploymentMode: SingleBinary
+
+singleBinary:
+  replicas: 1
+  
+  # Enable persistence - this creates a writable volume
+  persistence:
+    enabled: true
+    size: 3Gi
+    storageClass: local-path
+  
+  resources:
+    requests:
+      cpu: 50m      # Reduced from 100m
+      memory: 128Mi # Reduced from 256Mi
+    limits:
+      cpu: 500m     # Reduced from 1
+      memory: 512Mi # Reduced from 1Gi
+
+gateway:
+  enabled: false
+
+monitoring:
+  selfMonitoring:
+    enabled: false
+  lokiCanary:
+    enabled: false
+
+test:
+  enabled: false
+
+read:
+  replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+
+minio:
+  enabled: false
+

@@ -1,0 +1,33 @@
+adminUser: admin
+adminPassword: admin
+
+persistence:
+  enabled: true
+  storageClassName: local-path
+  size: 2Gi
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
+
+# Only Tempo data source
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Tempo
+      type: tempo
+      access: proxy
+      url: http://tempo.monitoring.svc.cluster.local:3200
+      uid: tempo
+      isDefault: true
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+

@@ -2,68 +2,74 @@ mode: daemonset
 
 image:
   repository: otel/opentelemetry-collector-contrib
-  tag: "latest"
 
-# Kubernetes Service configuration - THIS IS HELM CHART LEVEL
 service:
   enabled: true
   type: ClusterIP
-
-# this is collector config
-config:
-  receivers:
-    otlp:
-      protocols:
-        http:
-          endpoint: 0.0.0.0:4318
-        grpc:
-          endpoint: 0.0.0.0:4317
-
-  processors:
-    batch:
-      timeout: 1s
-      send_batch_size: 1024
-
-  exporters:
-    # prometheus:
-    #   endpoint: "0.0.0.0:8889"
-    #   namespace: "otel"
-    debug:
-      verbosity: normal
-      sampling_initial: 5
-      sampling_thereafter: 100
-
-    # otlp/jaeger:
-    #   endpoint: http://jaeger.tracing.svc.cluster.local:4317
-    #   tls:
-    #     insecure: true
-
-  service:
-    pipelines:
-      metrics:
-        receivers: [otlp]
-        processors: [batch]
-        exporters: [debug]
-      traces:
-        receivers: [otlp]
-        processors: [batch]
-        exporters: [debug]
-      logs:
-        receivers: [otlp]
-        processors: [batch]
-        exporters: [debug]
 
 ports:
   otlp:
     enabled: true
     containerPort: 4317
     servicePort: 4317
+    hostPort: 4317
+    protocol: TCP
   otlp-http:
     enabled: true
     containerPort: 4318
     servicePort: 4318
-    # hostPort: 4318 # this enables localhost access
-  prometheus:
-    enabled: true
-    containerPort: 8889
-    servicePort: 8889
+    hostPort: 4318
+    protocol: TCP
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+  
+  processors:
+    batch:
+      timeout: 10s
+      send_batch_size: 1024
+    
+    resource:
+      attributes:
+      - key: cluster.name
+        value: my-k8s-cluster
+        action: upsert
+  
+  exporters:
+    # Export traces to Tempo
+    otlp/tempo:
+      endpoint: tempo.monitoring.svc.cluster.local:4317
+      tls:
+        insecure: true
+    
+    # Debug exporter to see traces in logs
+    debug:
+      verbosity: detailed
+      sampling_initial: 5
+      sampling_thereafter: 100
+  
+  service:
+    pipelines:
+      # ONLY traces pipeline
+      traces:
+        receivers: [otlp]
+        processors: [batch, resource]
+        exporters: [otlp/tempo, debug]
+      
+      # Simple passthrough for metrics/logs (just debug)
+      metrics:
+        receivers: [otlp]
+        processors: [batch]
+        exporters: [debug]
+      
+      logs:
+        receivers: [otlp]
+        processors: [batch]
+        exporters: [debug]
+

@@ -2,15 +2,6 @@
 set -e
 
 # ----------------------------------------------------------------------------------------------
-# Cert-Manager (required for OpenTelemetry Operator)
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-helm upgrade --install cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --create-namespace \
-  --set installCRDs=true
-
-# ----------------------------------------------------------------------------------------------
 # Install OpenTelemetry Collector
 helm repo add opentelemetry https://open-telemetry.github.io/opentelemetry-helm-charts
 helm repo update
@@ -22,20 +13,22 @@ helm upgrade --install otel-collector opentelemetry/opentelemetry-collector \
   --values otel-values.yaml
 
 # ----------------------------------------------------------------------------------------------
-# Add Jaeger repository
-helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
-helm repo update
-helm install jaeger jaegertracing/jaeger \
-  --namespace monitoring \
-  --create-namespace \
-  --values jaeger-values.yaml
+# Install Grafana helm repository
 
-# ----------------------------------------------------------------------------------------------
-# Add the prometheus-community Helm repository
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# this one failed
+helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
-helm install prometheus prometheus-community/prometheus \
+
+# this seems to be working
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.28/deploy/local-path-storage.yaml
+
+
+# in progress
+helm install tempo grafana/tempo \
   --namespace monitoring \
-  --create-namespace \
-  --values prometheus-values.yaml
+  --values tempo-values.yaml
+
+helm upgrade grafana grafana/grafana \
+  --namespace monitoring \
+  --values grafana-values.yaml
 

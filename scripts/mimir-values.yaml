@@ -1,0 +1,48 @@
+mimir:
+  structuredConfig:
+    limits:
+      native_histograms_ingestion_enabled: true
+      max_global_series_per_user: 150000
+      ingestion_rate: 10000
+    
+    blocks_storage:
+      backend: filesystem
+      filesystem:
+        dir: /data/mimir
+
+# Single binary mode - all in one pod
+deploymentMode: SingleBinary
+
+# Disable nginx gateway
+nginx:
+  enabled: false
+
+minio:
+  enabled: false
+
+metaMonitoring:
+  serviceMonitor:
+    enabled: false
+  grafanaAgent:
+    enabled: false
+
+# Lightweight resources
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1
+    memory: 1Gi
+
+# Enable persistence
+persistence:
+  enabled: true
+  storageClass: local-path
+  size: 3Gi
+
+# Expose service
+service:
+  type: ClusterIP
+  port: 8080
+

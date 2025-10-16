@@ -1,0 +1,45 @@
+tempo:
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+  
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+  
+  retention: 168h  # 7 days
+
+server:
+  http_listen_port: 3100
+
+# Enable persistence with local-path
+persistence:
+  enabled: true
+  storageClassName: local-path
+  size: 5Gi
+
+# Lightweight resources
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+service:
+  type: ClusterIP
+
+# Disable unnecessary features
+metaMonitoring:
+  serviceMonitor:
+    enabled: false
+  grafanaAgent:
+    enabled: false
+
